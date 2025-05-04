@@ -1,0 +1,954 @@
+[PARSEHTML]
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Модерация</title>
+<div>
+  <style>
+    /* СЮДА НЕ ЛЕЗЕМ! СЮДА НЕ ЛЕЗЕМ! СЮДА НЕ ЛЕЗЕМ! СЮДА НЕ ЛЕЗЕМ! СЮДА НЕ ЛЕЗЕМ! СЮДА НЕ ЛЕЗЕМ! СЮДА НЕ ЛЕЗЕМ! СЮДА НЕ ЛЕЗЕМ! СЮДА НЕ ЛЕЗЕМ! */
+    /* СЮДА НЕ ЛЕЗЕМ! */
+    /* СЮДА НЕ ЛЕЗЕМ! */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0d0d0d;
+      color: white;
+      text-align: center;
+    }
+    h1 {
+      margin: 40px 0 30px;
+      font-size: 2.8em;
+    }
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      padding-bottom: 40px;
+      overflow: visible;
+    }
+    .card {
+      border: 2px solid;
+      border-radius: 20px;
+      padding: 20px;
+      width: 230px;
+      transition: transform 0.3s ease;
+      position: relative;
+      overflow: visible;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+ 
+    .avatar-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .avatar-border {
+      position: relative;
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+    }
+    .avatar-border::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      background: conic-gradient(#b30000, #d14d00, #ff6633, #d14d00, #b30000);
+      mask: radial-gradient(farthest-side, transparent calc(100% - 6px), black 100%);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), black 100%);
+      animation: spin 4s linear infinite;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 0;
+    }
+    .card:hover .avatar-border::before {
+      opacity: 1;
+    }
+.card:hover ~ .card {
+  transform: none !important;
+}
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.4s ease;
+    }
+    .card:hover .avatar {
+      transform: scale(1.05);
+    }
+ 
+.thought {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  background: rgba(100, 100, 120, 0.75);
+  color: #e0e0e0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  box-shadow: 0 0 10px rgba(80, 80, 100, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;         /* всегда в одну строку */
+  max-width: 300px;            /* максимум ширины */
+  overflow: hidden;            /* ничего не вылазит */
+  text-overflow: ellipsis;     /* если что — троеточие */
+}
+.red .card {
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+}
+.discord .card {
+  box-shadow: 0 0 15px rgba(255, 182, 217, 0.4);
+}
+.green .card {
+  box-shadow: 0 0 15px rgba(144, 238, 144, 0.4);
+}
+.curators .card {
+  box-shadow: 0 0 15px rgba(201, 167, 255, 0.4);
+}
+.pink .card {
+  box-shadow: 0 0 15px rgba(244, 185, 196, 0.4);
+}
+.senior .card {
+  box-shadow: 0 0 15px rgba(245, 222, 163, 0.4);
+}
+.moders .card {
+  box-shadow: 0 0 15px rgba(108, 178, 228, 0.4);
+}
+.junior .card {
+  box-shadow: 0 0 15px rgba(132, 199, 255, 0.4);
+}
+.departments .card {
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+.red .card:hover {
+  box-shadow: 0 0 30px 10px rgba(255, 0, 0, 0.5); /* при наведении */
+}
+.pink .card:hover {
+  box-shadow: 0 0 30px 10px rgba(244, 185, 196, 0.5);
+}
+ 
+.card:hover .thought {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+    .name {
+      font-weight: bold;
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+    .role {
+      font-size: 14px;
+      color: #ffcc99;
+      margin-bottom: 10px;
+    }
+    .icons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
+    .icons img {
+      width: 26px;
+      height: 26px;
+      transition: 0.2s;
+      filter: drop-shadow(0 0 3px rgb(148, 148, 148)
+);
+      cursor: pointer;
+    }
+    .icons img:hover {
+      transform: scale(1.3);
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Красная */
+    .red h1 {
+      color: #ff4a4a;
+      text-shadow: 0 0 15px #ff4a4a, 0 0 25px #ff0000;
+    }
+ 
+ 
+    .red .card {
+      border-color: #ff4a4a;
+    }
+    /* Discord */
+    .discord h1 {
+      color: #ffb6d9;
+      text-shadow: 0 0 15px #ffb6d9, 0 0 25px #ff8ccc;
+    }
+    .discord .card {
+      border-color: #ffb6d9;
+    }
+    .discord .card:hover {
+    box-shadow: 0 0 30px 10px rgba(255, 182, 217, 0.5);
+    }
+    .discord .avatar-border::before {
+      background: conic-gradient(#6e2c5f, #884b7e, #a86ca2, #884b7e, #6e2c5f);
+    }
+    /* Главная */
+    .green h1 {
+      color: #90ee90;
+      text-shadow: 0 0 15px #90ee90, 0 0 25px #00ff00;
+    }
+    /* 🟢 Главная модерация */
+    .green .card:nth-child(1):hover ~ .card:nth-child(2) {
+    transform: translateX(55px);
+    }
+    .green .card:hover {
+    box-shadow: 0 0 30px 10px rgba(144, 238, 144, 0.5);
+    }
+    .green .card {
+      border-color: #90ee90;
+    }
+    .green .avatar-border::before {
+      background: conic-gradient(#276d2d, #3f9144, #5ecb5a, #3f9144, #276d2d);
+    }
+    /* Кураторы */
+    .curators h1 {
+      color: #c9a7ff;
+      text-shadow: 0 0 15px #c9a7ff, 0 0 25px #b066ff;
+    }
+    .curators .card:hover {
+    box-shadow: 0 0 30px 10px rgba(201, 167, 255, 0.5);
+    }
+    /* 🟣 Кураторы модерации */
+ 
+    .curators .card {
+      border-color: #c9a7ff;
+    }
+    .curators .avatar-border::before {
+      background: conic-gradient(#4b2c69, #673a9e, #9262dc, #673a9e, #4b2c69);
+    }
+/* 🌸 Следящие за модерацией */
+.pink h1 {
+  color: #f4b9c4;
+  text-shadow: 0 0 15px #f4b9c4, 0 0 25px #e887a5;
+}
+.pink .card {
+  border-color: #f4b9c4;
+}
+.pink .card:hover {
+  box-shadow: 0 0 30px 10px rgba(244, 185, 196, 0.5); /* ← розовое свечение */
+  background: radial-gradient(circle at top, #2a1f24, #1e1e1e);
+}
+.pink .avatar-border::before {
+  background: conic-gradient(#7f4a5a, #a05e78, #d88ba5, #a05e78, #7f4a5a);
+}
+.pink .icons img:hover {
+  filter: drop-shadow(0 0 6px #f4b9c4);
+}
+.spec h1 {
+      color: #1f82a0;
+      text-shadow: 0 0 15px #1f82a0, 0 0 25px #0044ff;
+    }
+    /* 🟦 Специальные модераторы */
+    .spec .card:nth-child(1):hover ~ .card:nth-child(2) {
+    transform: translateX(55px);
+    }
+    .spec .card:hover {
+    box-shadow: 0 0 30px 10px #1f82a0;
+    }
+    .spec .card {
+      border-color: #1f82a0;
+    }
+    .spec .avatar-border::before {
+        background: conic-gradient(#0d2f3a, #1f82a0, #38a5c2, #1f82a0, #0d2f3a);
+    }
+/* 🟡 Старшая модерация */
+.senior h1 {
+  color: #f5dea3;
+  text-shadow: 0 0 15px #f5dea3, 0 0 25px #ffd875;
+}
+.senior .card {
+  border-color: #f5dea3;
+}
+.senior .card:hover {
+  box-shadow: 0 0 30px 10px rgba(245, 222, 163, 0.5);
+  background: radial-gradient(circle at top, #3c3320, #1e1e1e);
+}
+.senior .avatar-border::before {
+  background: conic-gradient(#b08d2b, #cba946, #f5dea3, #cba946, #b08d2b);
+}
+.senior .icons img:hover {
+  filter: drop-shadow(0 0 6px #f5dea3);
+}
+.break {
+  flex-basis: 100%;
+  height: 0;
+}
+/* Отодвигания */
+/* 🔵 Модерация */
+.moders h1 {
+  color: #6cb2e4;
+  text-shadow: 0 0 15px #6cb2e4, 0 0 25px #348fce;
+}
+.moders .card {
+  border-color: #6cb2e4;
+}
+.moders .card:hover {
+  box-shadow: 0 0 30px 10px rgba(108, 178, 228, 0.5);
+  background: radial-gradient(circle at top, #1f2d38, #1e1e1e);
+}
+.moders .avatar-border::before {
+  background: conic-gradient(#1c4d6c, #3282b8, #6cb2e4, #3282b8, #1c4d6c);
+}
+.moders .icons img:hover {
+  filter: drop-shadow(0 0 6px #6cb2e4);
+}
+/* 🔹 Младшая модерация */
+.junior h1 {
+  color: #84c7ff;
+  text-shadow: 0 0 15px #84c7ff, 0 0 25px #4fa5e6;
+}
+.junior .card {
+  border-color: #84c7ff;
+}
+.junior .card:hover {
+  box-shadow: 0 0 30px 10px rgba(132, 199, 255, 0.5);
+  background: radial-gradient(circle at top, #20303f, #1e1e1e);
+}
+.junior .avatar-border::before {
+  background: conic-gradient(#3b5d77, #579dd1, #84c7ff, #579dd1, #3b5d77);
+}
+.junior .icons img:hover {
+  filter: drop-shadow(0 0 6px #84c7ff);
+}
+/* 🧊 Отодвигание в младшей модерации */
+/* 🧩 Руководители Отделов */
+.departments h1 {
+  color: #ddd;
+  text-shadow: 0 0 15px #fff, 0 0 25px #999;
+}
+.label {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  color: white;
+  font-weight: bold;
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  transform: rotate(-10deg);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  z-index: 5;
+  pointer-events: none;
+}
+/* Обновлённые авторские цвета */
+.label.purple {
+  background: #8c6eff; /* Лавандовый фиолет */}
+.label.blue {
+  background: #4da8ff; /* Чистый небесный */}
+.label.red {
+  background: #ff5c5c; /* Мягкий алый */}
+.label.yellow {
+  background: #ffd859;  /* Золото */
+  color: #222;
+}
+.label.green {
+  background: #5ed698; /* Мятно-зелёный */
+}
+.label.orange {
+  background: #ff934f; /* Тёплый апельсиновый */
+}
+.label.gray {
+  background: #a0a0a0; /* Нейтрально-серый */
+}
+.label.pink {
+  background: #ff7bbf; /* Ярко-розовый (клубничный) */
+}
+.label.cyan {
+  background: #5df2f2; /* Лёгкий бирюзовый (светящийся) */
+  color: #002b2b;
+}
+.label.deepblue {
+  background: #2c3e50; /* Глубокий тёмно-синий */
+}
+.label.lime {
+  background: #caff70; /* Лаймово-зелёный */
+  color: #202020;
+}
+.label.bronze {
+  background: #cd7f32; /* Бронза */
+}
+.label.maroon {
+  background: #800000; /* Тёмно-бордовый */
+}
+.label.beige {
+  background: #f5f5dc; /* Светло-бежевый */
+  color: #222;
+}
+.label-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.label-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.label-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.easter-sticker {
+  position: fixed;
+  bottom: -150px;
+  left: -305%;
+  transform: translateX(-50%) rotate(90deg);
+  width: 100px;
+  transition: bottom 0.6s ease;
+  z-index: 9999;
+  pointer-events: none;
+}
+.label-wrapper:hover .easter-sticker {
+  bottom: 20px;
+}
+.easterr-sticker {
+  position: fixed;
+  bottom: -150px;
+  left: 470%;
+  transform: translateX(-50%) rotate(270deg); /* Добавили поворот */
+  width: 100px;
+  transition: bottom 0.6s ease;
+  z-index: 9999;
+  pointer-events: none;
+}
+.label-wrapper:hover .easterr-sticker {
+  bottom: 20px;
+}
+.label.week {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #006d5b; /* тёмно-изумрудный */
+  color: #ffffff;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 13px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  z-index: 6;
+  pointer-events: none;
+}
+/* МЕНЯТЬ ТУТ */
+/* МЕНЯТЬ ТУТ */
+/* МЕНЯТЬ ТУТ */
+/* МЕНЯТЬ ТУТ */
+  </style>
+</head>
+<body>
+<div class="red">
+  <h1>Руководство Keeper</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/0/1.jpg?1701694154" class="avatar">
+          <div class="thought">Думает о кофе...</div>
+        </div>
+      </div>
+      <div class="name">Pavel Cherenkov</div>
+      <div class="role">👑 Генеральный Директор</div>
+<div class="icons">
+  <a href="https://vk.com/lapa_paha" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/cherenkov/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/0/4.jpg?1703589164" class="avatar">
+          <div class="thought">Строит планы...</div>
+        </div>
+      </div>
+      <div class="name">Dmitriy Cherenkov</div>
+      <div class="role">👑 Заместитель Генерального Директора</div>
+<div class="icons">
+  <a href="https://vk.com/onefixed" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/members/4/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/0/9.jpg?1715778845" class="avatar">
+          <div class="thought">Мечтает...</div>
+        </div>
+      </div>
+      <div class="name">Patrick Morzhov</div>
+      <div class="role">👑 Исполнительный Директор</div>
+<div class="icons">
+  <a href="https://vk.com/1banini1" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/members/9/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+  </div>
+</div>
+<div class="discord">
+  <h1>Следящий за Discord</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/0/421.jpg?1714396175" class="avatar">
+          <div class="thought">Следит за порядком в Discord...</div>
+        </div>
+      </div>
+      <div class="name">Han Ahmatov</div>
+      <div class="role">🔭 Следящий за Discord</div>
+<div class="icons">
+  <a href="https://vk.com/aaaavl97k" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/xan/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+  </div>
+</div>
+<div class="green">
+  <h1>Главная модерация</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/2/2599.jpg?1746201012" class="avatar">
+          <div class="thought">Следит за всеми...</div>
+        </div>
+      </div>
+      <div class="name">Arseni Mixov</div>
+      <div class="role">🍏 Главный Модератор</div>
+<div class="icons">
+  <a href="https://vk.com/nikitinarsenii" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/mix/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/0/417.jpg?1732570594" class="avatar">
+          <div class="thought">Всегда рядом с Главным...</div>
+        </div>
+      </div>
+      <div class="name">Artem Ahmatov</div>
+      <div class="role">🫒 Заместитель Главного Модератора</div>
+<div class="icons">
+  <a href="https://vk.com/ahmatov_dynasty" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/ahmatov/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+  </div>
+</div>
+<div class="curators">
+  <h1>Кураторы модерации</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/1/1401.jpg?1723944210" class="avatar">
+          <div class="thought">I am comeen?</div>
+        </div>
+      </div>
+      <div class="name">Asan Bekbaev</div>
+      <div class="role">🍆 Куратор Модерации</div>
+<div class="icons">
+  <a href="https://vk.com/jesuscox" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/members/1401/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/2/2546.jpg?1744889541" class="avatar">
+          <div class="thought">Я хотел....</div>
+        </div>
+      </div>
+      <div class="name">Kirill Sherstuk</div>
+      <div class="role">👠 Куратор Модерации</div>
+<div class="icons">
+  <a href="https://vk.com/ksherstuk" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/members/2546/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+  </div>
+</div>
+<div class="pink">
+  <h1>Следящие за модерацией</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/1/1698.jpg?1735460041" class="avatar">
+          <div class="thought">MC POX</div>
+        </div>
+      </div>
+      <div class="name">Pavel Ahmatov</div>
+      <div class="role">🎸 Следящий за Модерацией</div>
+<div class="icons">
+  <a href="https://vk.com/sheinivr" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/members/1698/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+    <div class="card">
+<div class="label purple">Наша самая дорогая</div>
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/1/1659.jpg?1723405126" class="avatar">
+          <div class="thought">Контролирует всё в тени...</div>
+        </div>
+      </div>
+      <div class="name">Maya Evans</div>
+      <div class="role">💗 Следящая за Модерацией</div>
+<div class="icons">
+  <a href="https://vk.com/id478129164" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/members/1659/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+  </div>
+</div>
+<div class="spec">
+  <h1>Специальная Модерация</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://sun9-61.userapi.com/impg/fta-g1yO_YQ2jWOjeh0ng4rzTni-FWCTXDmBmA/22nzNL9R1uI.jpg?size=1200x1200&quality=95&sign=421f7dd84d735a703fd8eb303ac26733&type=album" class="avatar">
+          <div class="thought">Капт-Наша жизнь!</div>
+        </div>
+      </div>
+      <div class="name">David Rezvov</div>
+      <div class="role">🐟 Специальный Модератор</div>
+<div class="icons">
+  <a href="https://vk.com/d.rezvov" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/members/1954/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/2/2102.jpg?1746301027" class="avatar">
+          <div class="thought">А что сюда писать?</div>
+        </div>
+      </div>
+      <div class="name">Vlad Forbes</div>
+      <div class="role">🐟 Специальный Модератор</div>
+<div class="icons">
+  <a href="https://vk.com/id774474731" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/members/2102/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+    </div>
+        <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/1/1582.jpg?1734253342" class="avatar">
+          <div class="thought">Знает, кто виноват без логов...</div>
+        </div>
+      </div>
+      <div class="name">Maxim Kolbik</div>
+      <div class="role">🐟 Специальный Модератор</div>
+<div class="icons">
+  <a href="https://vk.com/maxim_kolbik" target="_blank">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+  </a>
+  <a href="https://forum.keeper-nexus.com/members/1582/" target="_blank">
+    <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+  </a>
+</div>
+</div>
+</div>
+<div class="senior">
+  <h1>Старшая модерация</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/2/2275.jpg?1739223890" class="avatar">
+          <div class="thought">He/His</div>
+        </div>
+      </div>
+      <div class="name">Hardy Scary</div>
+      <div class="role">🍊 Старший Модератор</div>
+      <div class="icons">
+        <a href="https://vk.com/lorefires1" target="_blank">
+          <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK">
+        </a>
+        <a href="https://forum.keeper-nexus.com/hardyscary/" target="_blank">
+          <img src="https://i.yapx.ru/YvFuZ.png" alt="Discord">
+        </a>
+      </div>
+    </div>
+    <div class="card">
+<div class="label week">Модератор недели</div>
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://forum.keeper-nexus.com/data/avatars/l/1/1646.jpg?1745760965" class="avatar">
+          <div class="thought">Сосал?</div>
+        </div>
+      </div>
+      <div class="name">Nur Ahmatov</div>
+      <div class="role">🍊 Старший Модератор</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+</div>
+<div class="moders">
+  <h1>Модерация</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://i.imgur.com/E3En4Oq.jpeg" class="avatar">
+          <div class="thought">Всё под контролем...</div>
+        </div>
+      </div>
+      <div class="name">*******</div>
+      <div class="role">👑 Модератор</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="junior">
+  <h1>Младшая модерация</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="label deepblue">Создатель этого чуда</div>
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://stickerbase.ru/wp-content/uploads/2020/02/7320.png" class="avatar">
+          <div class="thought">Смотрит в шоке...</div>
+        </div>
+      </div>
+      <div class="name">Jony Volfo</div>
+      <div class="role">👑 Младший Модератор</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://i.imgur.com/W1IYxJj.jpeg" class="avatar">
+          <div class="thought">Тихо контролирует...</div>
+        </div>
+      </div>
+      <div class="name">********</div>
+      <div class="role">👑 Младший Модератор</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://i.imgur.com/AagHAB8.jpeg" class="avatar">
+          <div class="thought">Готов нажать бан...</div>
+        </div>
+      </div>
+      <div class="name">********</div>
+      <div class="role">👑 Младший Модератор</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://i.imgur.com/FbNboq4.jpeg" class="avatar">
+          <div class="thought">Понимает с полувзгляда...</div>
+        </div>
+      </div>
+      <div class="name">*********</div>
+      <div class="role">👑 Младший Модератор</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://i.imgur.com/hp3r3XD.jpeg" class="avatar">
+          <div class="thought">На связи с природой...</div>
+        </div>
+      </div>
+      <div class="name">********</div>
+      <div class="role">👑 Младший Модератор</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://i.imgur.com/VoX06XK.jpeg" class="avatar">
+          <div class="thought">Скрывается в тени...</div>
+        </div>
+      </div>
+      <div class="name">*******</div>
+      <div class="role">👑 Младший Модератор</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://i.imgur.com/o06qvKZ.jpeg" class="avatar">
+          <div class="thought">Следит издалека...</div>
+        </div>
+      </div>
+      <div class="name">******r</div>
+      <div class="role">👑 Младший Модератор</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="departments">
+  <h1>Руководители Отделов</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="label bronze">Ведущие</div>
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://i.imgur.com/kQ5MZ3s.jpeg" class="avatar">
+          <div class="thought">Проводит эфиры...</div>
+        </div>
+      </div>
+      <div class="name">****************</div>
+      <div class="role">👑 Главный Ведущий</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+    <div class="card">
+      <div class="label green">Магазин</div>
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://i.imgur.com/Dr6UHH5.jpeg" class="avatar">
+          <div class="thought">Следит за доходами...</div>
+        </div>
+      </div>
+      <div class="name">*************</div>
+      <div class="role">👑 Главный Менеджер</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+      </div>
+    </div>
+    <div class="card">
+      <div class="label maroon">Редакция</div>
+      <div class="avatar-wrapper">
+        <div class="avatar-border">
+          <img src="https://i.imgur.com/ETRDJoz.jpeg" class="avatar">
+          <div class="thought">Правит слова и смыслы...</div>
+        </div>
+      </div>
+      <div class="name">*************</div>
+      <div class="role">👑 Главный Редактор</div>
+      <div class="icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+      </div>
+    </div>
+ 
+<div class="break"></div>
+ 
+<div class="card">
+  <div class="label orange">Махинации</div>
+  <div class="avatar-wrapper">
+    <div class="avatar-border">
+      <img src="https://i.imgur.com/1nUoJEr.jpeg" class="avatar">
+      <div class="thought">Планирует схемы...</div>
+    </div>
+  </div>
+  <div class="name">*********</div>
+  <div class="role">👑 Рук.Отдела Махинаций</div>
+  <div class="icons">
+    <img src="https://cdn-icons-png.flaticon.com/512/145/145813.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111728.png">
+  </div>
+</div>
+  </div>
+</div>
+  </div>
+</body>
+</html>
+[/PARSEHTML]
